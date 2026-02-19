@@ -2,5 +2,5 @@
 
 int	main()
 {
-	ScalarConverter::convert("123f");
+	ScalarConverter::convert("1.34");
 }
