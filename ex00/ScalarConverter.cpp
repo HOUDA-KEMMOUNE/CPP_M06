@@ -48,6 +48,26 @@ int	check_int( std::string &data )
 	return (1);
 }
 
+int	check_float( std::string &data )
+{
+	int	len = data.length();
+	int	i = 0;
+	int	flag = 0;
+
+	while (i < len)
+	{
+		if (!isdigit(static_cast<int>(data[i])))
+		{
+			// std::cout << "Invalid input ❌\n";
+
+			return (0);
+		}
+		i++;
+	}
+	std::cout << "Invalid input ✅\n";
+	return (1);
+}
+
 void	parser( std::string &data )
 {
 	if (check_char(data))
