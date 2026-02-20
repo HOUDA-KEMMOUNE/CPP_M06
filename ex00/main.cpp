@@ -1,6 +1,11 @@
 #include "ScalarConverter.hpp"
 
-int	main()
+int	main(int ac, char **av)
 {
-	ScalarConverter::convert("1.34");
+	if (ac != 2)
+	{
+		std::cerr << "Enter an argument please !\n";
+		return (1);
+	}
+	ScalarConverter::convert(av[1]);
 }

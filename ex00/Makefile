@@ -1,11 +1,10 @@
-NAME = cast
+NAME = convert
 CPP = c++
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
-SRC = ScalarConverter.cpp main.cpp
+SRC = $(shell ls | grep '\.cpp')
 OBJ = $(SRC:.cpp=.o)
 
-all: $(NAME) clean
-	@./$(NAME)
+all: $(NAME)
 
 %.o: %.cpp
 	@$(CPP) $(CPPFLAGS) -c $< -o $@
