@@ -68,11 +68,11 @@ int	check_float( std::string &data, type *t )
 		{
 			if (i + 1 == len && data[i] == 'f')
 			{
-				std::cout << "float -> valid input ✅\n";
+				// std::cout << "float -> valid input ✅\n";
 				*t = FLOAT;
 				return (1);
 			}
-			if (data[i] == '.' && flag == 0)
+			if (data[i] == '.' && data[i + 1] != '\0' && data[i + 1] != 'f' && flag == 0)
 				flag++;
 			else
 				return (0);
@@ -81,7 +81,6 @@ int	check_float( std::string &data, type *t )
 			return (0);
 		i++;
 	}
-	std::cout << "float -> valid input ✅\n";
 	*t = FLOAT;
 	return (1);
 }
@@ -101,14 +100,13 @@ int	check_double( std::string &data, type *t )
 		}
 		if (!isdigit(static_cast<int>(data[i])))
 		{
-			if (data[i] == '.' && flag == 0)
+			if (data[i] == '.' && data[i + 1] != '\0' && flag == 0)
 				flag++;
 			else
 				return (0);
 		}
 		i++;
 	}
-	std::cout << "double -> valid input ✅\n";
 	*t = DOUBLE;
 
 	return (1);
@@ -169,45 +167,120 @@ void	cast_char( double d )
 		std::cout << "char: Non displayable\n";
 }
 
+void	cast_int( double d )
+{
+	if (d < INT_MIN || d > INT_MAX)
+	{
+		std::cout << "int: impossible\n";
+		return ;
+	}
+	int		i = static_cast<int>(d);
+	std::cout << "int: " << i << std::endl;
+}
+
 void	int_part( double d )
 {
 	cast_char(d);
 
-	int		i = static_cast<int>(d);
-	std::cout << "int: " << i << std::endl;
+	cast_int(d);
 
 	float	f = static_cast<float>(d);
 	std::cout << std::fixed << std::setprecision(1);
 	std::cout << "float: " << f << "f" << std::endl;
 
 	double	db = static_cast<double>(d);
-	std::cout << std::fixed << std::setprecision(1);
-	std::cout << "double: " << db << std::endl;
+	if (std::isinf(f))
+	{
+		std::cout << std::scientific << std::setprecision(1);
+		std::cout << "double: " << db << std::endl;
+	}
+	else
+	{
+		std::cout << std::fixed << std::setprecision(1);
+		std::cout << "double: " << db << std::endl;
+	}
 }
 
-void	float_part( double d )
+void	float_double_part( double d, double count )
 {
 	cast_char(d);
 
-	int		i = static_cast<int>(d);
-	std::cout << "int: " << i << std::endl;
+	if (count > 6)
+		count = 6;
 
+	if (std::isinf(d) || d < INT_MIN || d > INT_MAX)
+		std::cout << "int: impossible\n";
+	else
+	{
+		int		i = static_cast<int>(d);
+		std::cout << "int: " << i << std::endl;
+	}
+	
 	float	f = static_cast<float>(d);
-	std::cout << std::fixed;
+	if (f == static_cast<int>(f))
+		std::cout << std::fixed << std::setprecision(1);
+	else
+		std::cout.unsetf(std::ios::floatfield);
+
 	std::cout << "float: " << f << "f" << std::endl;
 
 	double	db = static_cast<double>(d);
-	std::cout << std::fixed;
+	if (db == static_cast<double>(db))
+		std::cout << std::fixed << std::setprecision(1);
+	else
+		std::cout.unsetf(std::ios::floatfield);
+	std::cout << "double: " << db << std::endl;
+	std::cout.unsetf(std::ios::floatfield);
+}
+
+void	others_part( double d )
+{
+	std::cout << "char: impossible\n";
+	std::cout << "int: impossible\n";
+
+	float	f = static_cast<float>(d);
+	std::cout << std::fixed << std::setprecision(1);
+	std::cout << "float: " << f << "f" << std::endl;
+
+	double	db = static_cast<double>(d);
+	std::cout << std::fixed << std::setprecision(1);
 	std::cout << "double: " << db << std::endl;
 }
 
-void	cast( double d, type t )
+void	cast( double d, type t, int count )
 {
 	if (t == INT)
 		int_part(d);
-	else if (t == FLOAT)
-		float_part(d);
+	else if (t == FLOAT || t == DOUBLE)
+		float_double_part(d, count);
+	else if (t == OTHERS)
+		others_part(d);
 	return ;
+}
+
+double	count_double( std::string literal, type t )
+{
+	if (t != FLOAT && t != DOUBLE)
+		return (0);
+	
+	int	i = 0;
+	int	count = 0;
+	int	flag = 0;
+
+	while (literal[i])
+	{
+		if (literal[i] != '.' && flag == 0)
+		{
+			i++;
+			continue;
+		}
+		flag = 1;
+		if (literal[i] != 'f')
+			count++;
+		i++;
+	}
+	count--;
+	return (count);
 }
 
 void	ScalarConverter::convert( std::string literal )
@@ -215,30 +288,17 @@ void	ScalarConverter::convert( std::string literal )
 	type	t;
 	if (!parser(literal, &t))
 		return ;
+	double	count = count_double(literal, t);
+
 	char	**end  = NULL;
 	if (t != 0)
 	{
 		double	d = strtod(literal.c_str(), end);
 		if (end == NULL)
 		{
-			cast(d, t);
+			cast(d, t, count);
 		}
 	}
-	// std::cout << "d --> " << d << std::endl;
 }
 
 ScalarConverter::~ScalarConverter( void ){}
-
-// void parse_int(std::string &data)
-// {
-// 	char *end;
-// 	double d = strtod(data.c_str(), &end);
-// 	if(end)
-// 	{
-// 		// function all impossible
-// 		return;
-// 	}
-// 	// print_types(d);
-// }
-
-// void	parse_char
