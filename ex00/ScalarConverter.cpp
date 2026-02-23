@@ -72,7 +72,7 @@ int	check_float( std::string &data, type *t )
 				*t = FLOAT;
 				return (1);
 			}
-			if (data[i] == '.' && data[i + 1] != '\0' && data[i + 1] != 'f' && flag == 0)
+			if (data[i] == '.' && data[i + 1] != 'f' && flag == 0)
 				flag++;
 			else
 				return (0);

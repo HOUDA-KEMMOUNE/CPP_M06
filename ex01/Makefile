@@ -13,7 +13,7 @@ $(NAME): $(OBJ)
 	@$(CPP) $(CPPFLAGS) $(OBJ) -o $@
 
 clean:
-	@rm -rf $(OBJ) && clear
+	@rm -rf $(OBJ)
 
 fclean: clean
 	@rm -rf $(NAME)
