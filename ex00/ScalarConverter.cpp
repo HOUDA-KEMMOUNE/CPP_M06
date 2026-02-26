@@ -22,7 +22,6 @@ int	check_char( std::string &data, type *t )
 	{
 		if (data[0] >= 'a' && data[0] <= 'z')
 		{
-			std::cout << "char -> valid input ✅\n";
 			*t = CHAR;
 			return (1);
 		}
@@ -117,7 +116,6 @@ int	check_others( std::string &data, type *t )
 	if (data == "nan" || data == "nanf" || data == "-inff"
 		|| data == "+inff" || data == "-inf" || data == "+inf")
 	{
-		std::cout << "pseudo-literal -> valid input ✅\n";
 		*t = OTHERS;
 		return (1);
 	}
@@ -201,12 +199,9 @@ void	int_part( double d )
 	}
 }
 
-void	float_double_part( double d, double count )
+void	float_double_part( double d )
 {
 	cast_char(d);
-
-	if (count > 6)
-		count = 6;
 
 	if (std::isinf(d) || d < INT_MIN || d > INT_MAX)
 		std::cout << "int: impossible\n";
@@ -217,20 +212,12 @@ void	float_double_part( double d, double count )
 	}
 	
 	float	f = static_cast<float>(d);
-	if (f == static_cast<int>(f))
-		std::cout << std::fixed << std::setprecision(1);
-	else
-		std::cout.unsetf(std::ios::floatfield);
-
+	std::cout << std::fixed << std::setprecision(2);
 	std::cout << "float: " << f << "f" << std::endl;
 
 	double	db = static_cast<double>(d);
-	if (db == static_cast<double>(db))
-		std::cout << std::fixed << std::setprecision(1);
-	else
-		std::cout.unsetf(std::ios::floatfield);
+	std::cout << std::fixed << std::setprecision(2);
 	std::cout << "double: " << db << std::endl;
-	std::cout.unsetf(std::ios::floatfield);
 }
 
 void	others_part( double d )
@@ -247,40 +234,33 @@ void	others_part( double d )
 	std::cout << "double: " << db << std::endl;
 }
 
-void	cast( double d, type t, int count )
+void	cast( double d, type t )
 {
 	if (t == INT)
 		int_part(d);
 	else if (t == FLOAT || t == DOUBLE)
-		float_double_part(d, count);
+		float_double_part(d);
 	else if (t == OTHERS)
 		others_part(d);
 	return ;
 }
 
-double	count_double( std::string literal, type t )
+void	char_case( std::string literal )
 {
-	if (t != FLOAT && t != DOUBLE)
-		return (0);
+	char	c = literal[0];
 	
-	int	i = 0;
-	int	count = 0;
-	int	flag = 0;
+	std::cout << "char: " << c << std::endl;
+	
+	int		i = static_cast<int>(c);
+	std::cout << "int: "  << i << std::endl;
+	
+	float	f = static_cast<float>(c);
+	std::cout << std::fixed << std::setprecision(1);
+	std::cout << "float: " << f << "f\n";
 
-	while (literal[i])
-	{
-		if (literal[i] != '.' && flag == 0)
-		{
-			i++;
-			continue;
-		}
-		flag = 1;
-		if (literal[i] != 'f')
-			count++;
-		i++;
-	}
-	count--;
-	return (count);
+	double	d = static_cast<double>(c);
+	std::cout << std::fixed << std::setprecision(1);
+	std::cout << "double: " << d << std::endl;
 }
 
 void	ScalarConverter::convert( std::string literal )
@@ -288,16 +268,15 @@ void	ScalarConverter::convert( std::string literal )
 	type	t;
 	if (!parser(literal, &t))
 		return ;
-	double	count = count_double(literal, t);
 
 	char	**end  = NULL;
-	if (t != 0)
+	if (t == 0)
+		char_case(literal);
+	else
 	{
 		double	d = strtod(literal.c_str(), end);
 		if (end == NULL)
-		{
-			cast(d, t, count);
-		}
+			cast(d, t);
 	}
 }
 
